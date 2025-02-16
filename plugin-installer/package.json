@@ -1,0 +1,35 @@
+{
+  "name": "plugin-installer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "extract-abi": "tsx -r dotenv/config scripts/extractAbi.ts",
+    "generate-plugin": "npx plugingen generate",
+    "build": "pnpm extract-abi && pnpm generate-plugin",
+    "get-address": "tsx -r dotenv/config src/index.ts get-address",
+    "install-plugin": "tsx -r dotenv/config src/index.ts install-plugin"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aa-sdk/core": "^4.13.0",
+    "@account-kit/infra": "^4.13.0",
+    "@account-kit/smart-contracts": "^4.13.0",
+    "@alchemy/aa-alchemy": "3.19.0",
+    "@alchemy/aa-core": "3.19.0",
+    "dotenv": "^16.4.7",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "viem": "^2.23.2"
+  },
+  "devDependencies": {
+    "@account-kit/plugingen": "^4.13.0",
+    "@types/node": "^22.13.4",
+    "dotenv-expand": "^12.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

@@ -17,9 +17,9 @@ import {IMultiOwnerPlugin} from "@alchemy/modular-account/src/plugins/owner/IMul
 /// @notice This plugin lets increment a count!
 contract CounterPlugin is BasePlugin {
     // metadata used by the pluginMetadata() method down below
-    string public constant NAME = "Counter Plugin";
+    string public constant NAME = "Locker Counter Plugin";
     string public constant VERSION = "1.0.0";
-    string public constant AUTHOR = "Alchemy";
+    string public constant AUTHOR = "Locker Team";
 
     // this is a constant used in the manifest, to reference our only dependency: the multi owner plugin
     // since it is the first, and only, plugin the index 0 will reference the multi owner plugin
