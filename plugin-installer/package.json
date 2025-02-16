@@ -8,8 +8,11 @@
     "extract-abi": "tsx -r dotenv/config scripts/extractAbi.ts",
     "generate-plugin": "npx plugingen generate",
     "build": "pnpm extract-abi && pnpm generate-plugin",
-    "get-address": "tsx -r dotenv/config src/index.ts get-address",
-    "install-plugin": "tsx -r dotenv/config src/index.ts install-plugin"
+    "exec-action": "tsx -r dotenv/config src/index.ts",
+    "get-address": "pnpm exec-action get-address",
+    "install-plugin": "pnpm exec-action install-plugin",
+    "uninstall-plugin": "pnpm exec-action uninstall-plugin",
+    "get-count": "pnpm exec-action get-count"
   },
   "keywords": [],
   "author": "",

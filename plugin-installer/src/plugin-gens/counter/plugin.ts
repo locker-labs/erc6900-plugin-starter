@@ -104,12 +104,12 @@ export type CounterPluginActions<
   ReadAndEncodeActions;
 
 const addresses = {
-  84532: "0x61FBA6AB92193fc83D8aC150984AE0BC25A36D5E" as Address,
+  84532: "0x1eBaA4C7808bEeA5d370Db94850f08BD0791dFF0" as Address,
 } as Record<number, Address>;
 
 export const CounterPlugin: Plugin<typeof CounterPluginAbi> = {
   meta: {
-    name: "Counter Plugin",
+    name: "Locker Counter Plugin",
     version: "1.0.0",
     addresses,
   },

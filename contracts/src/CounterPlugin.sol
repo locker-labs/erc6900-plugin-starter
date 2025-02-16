@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import {BasePlugin} from "@alchemy/modular-account/src/plugins/BasePlugin.sol";
 import {IPluginExecutor} from "@alchemy/modular-account/src/interfaces/IPluginExecutor.sol";
+import {IPlugin} from "@alchemy/modular-account/src/interfaces/IPlugin.sol";
 import {
     ManifestFunction,
     ManifestAssociatedFunctionType,
@@ -10,7 +11,7 @@ import {
     PluginManifest,
     PluginMetadata
 } from "@alchemy/modular-account/src/interfaces/IPlugin.sol";
-import {IMultiOwnerPlugin} from "@alchemy/modular-account/src/plugins/owner/IMultiOwnerPlugin.sol";
+import {UserOperation} from "@alchemy/modular-account/src/interfaces/erc4337/UserOperation.sol";
 
 /// @title Counter Plugin
 /// @author Alchemy
@@ -18,15 +19,16 @@ import {IMultiOwnerPlugin} from "@alchemy/modular-account/src/plugins/owner/IMul
 contract CounterPlugin is BasePlugin {
     // metadata used by the pluginMetadata() method down below
     string public constant NAME = "Locker Counter Plugin";
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "0.0.1";
     string public constant AUTHOR = "Locker Team";
 
     // this is a constant used in the manifest, to reference our only dependency: the multi owner plugin
     // since it is the first, and only, plugin the index 0 will reference the multi owner plugin
     // we can use this to tell the modular account that we should use the multi owner plugin to validate our user op
     // in other words, we'll say "make sure the person calling increment is an owner of the account using our multiowner plugin"
-    uint256 internal constant _MANIFEST_DEPENDENCY_INDEX_OWNER_USER_OP_VALIDATION = 0;
-
+    // uint256 internal constant _MANIFEST_DEPENDENCY_INDEX_OWNER_RUNTIME_VALIDATION = 0;
+    // uint256 internal constant _MANIFEST_DEPENDENCY_INDEX_OWNER_USER_OP_VALIDATION = 0;
+    
     /*
     * Note to Developer:
     * If you're using storage during validation, you need to use "associated storage".
@@ -51,6 +53,23 @@ contract CounterPlugin is BasePlugin {
         count[msg.sender]++;
     }
 
+    /// @notice This function is modified to always return true for validation
+    /// @dev This is a simplified version that doesn't use MultiOwner plugin
+    function userOpValidationFunction(
+        uint8 functionId,
+        UserOperation calldata userOp,
+        bytes32 userOpHash
+    ) external override(BasePlugin) returns (uint256) {
+        // Ignore the input parameters since we're always returning true
+        (functionId, userOp, userOpHash);
+        
+        // Return packed validation data where:
+        // - validAfter = 0 (6 bytes)
+        // - validUntil = type(uint48).max (6 bytes) 
+        // - authorizer = address(1) (20 bytes)
+        // This indicates the operation is always valid
+        return (uint256(type(uint48).max) << 48) | 1;
+    }
     // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     // ┃    Plugin interface functions    ┃
     // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -65,48 +84,35 @@ contract CounterPlugin is BasePlugin {
     function pluginManifest() external pure override returns (PluginManifest memory) {
         PluginManifest memory manifest;
 
-        // since we are using the modular account, we will specify one depedency
-        // which will be the multiowner plugin
-        // you can find this depedency specified in the installPlugin call in the tests
-        manifest.dependencyInterfaceIds = new bytes4[](1);
-        manifest.dependencyInterfaceIds[0] = type(IMultiOwnerPlugin).interfaceId;
+        // Remove dependency on MultiOwner plugin since we're not using it
+        manifest.dependencyInterfaceIds = new bytes4[](0);
 
-        // we only have one execution function that can be called, which is the increment function
-        // here we define that increment function on the manifest as something that can be called during execution
+        // Keep the execution function for increment
         manifest.executionFunctions = new bytes4[](1);
         manifest.executionFunctions[0] = this.increment.selector;
 
-        // you can think of ManifestFunction as a reference to a function somewhere,
-        // we want to say "use this function" for some purpose - in this case,
-        // we'll be using the user op validation function from the multi owner dependency
-        // and this is specified by the depdendency index
-        ManifestFunction memory ownerUserOpValidationFunction = ManifestFunction({
-            functionType: ManifestAssociatedFunctionType.DEPENDENCY,
-            functionId: 0, // unused since it's a dependency
-            dependencyIndex: _MANIFEST_DEPENDENCY_INDEX_OWNER_USER_OP_VALIDATION
+        // Create validation function that points to our own userOpValidationFunction
+        ManifestFunction memory validationFunction = ManifestFunction({
+            functionType: ManifestAssociatedFunctionType.SELF,
+            functionId: 0,
+            dependencyIndex: 0
         });
 
-        // here we will link together the increment function with the multi owner user op validation
-        // this basically says "use this user op validation function and make sure everythings okay before calling increment"
-        // this will ensure that only an owner of the account can call increment
+        // Link increment with our validation function
         manifest.userOpValidationFunctions = new ManifestAssociatedFunction[](1);
         manifest.userOpValidationFunctions[0] = ManifestAssociatedFunction({
             executionSelector: this.increment.selector,
-            associatedFunction: ownerUserOpValidationFunction
+            associatedFunction: validationFunction
         });
 
-        // finally here we will always deny runtime calls to the increment function as we will only call it through user ops
-        // this avoids a potential issue where a future plugin may define
-        // a runtime validation function for it and unauthorized calls may occur due to that
-        manifest.preRuntimeValidationHooks = new ManifestAssociatedFunction[](1);
-        manifest.preRuntimeValidationHooks[0] = ManifestAssociatedFunction({
-            executionSelector: this.increment.selector,
-            associatedFunction: ManifestFunction({
-                functionType: ManifestAssociatedFunctionType.PRE_HOOK_ALWAYS_DENY,
-                functionId: 0,
-                dependencyIndex: 0
-            })
-        });
+        // We do not use runtime validation, so leave these arrays empty.
+        manifest.runtimeValidationFunctions = new ManifestAssociatedFunction[](0);
+        manifest.preRuntimeValidationHooks = new ManifestAssociatedFunction[](0);
+
+        // Set permissions.
+        manifest.permitAnyExternalAddress = true;
+        manifest.canSpendNativeToken = true;
+        manifest.permittedExecutionSelectors = new bytes4[](0);
 
         return manifest;
     }

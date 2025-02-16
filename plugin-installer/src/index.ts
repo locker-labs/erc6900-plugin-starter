@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { getAccountAddress, getModularAccountClient } from "./client";
 import { counterPluginActions } from "./plugin-gens/counter/plugin";
-import { installCounterPlugin } from "./plugin-actions";
+import { getCount, installCounterPlugin, uninstallCounterPlugin } from "./plugin-actions";
 dotenv.config();
 
 export async function main() {
@@ -19,9 +19,18 @@ export async function main() {
             await installCounterPlugin(extendedAccount);
             break;
 
+        case "uninstall-plugin":
+            await uninstallCounterPlugin(extendedAccount);
+            break;
+
+        case "get-count":
+            const count = await getCount(extendedAccount);
+            console.log("Count:", count);
+            break;
+
         default:
             console.log(
-                "Invalid command. Use one of: 'get-address', 'install-plugin'."
+                "Invalid command. Use one of: 'get-address', 'install-plugin', 'uninstall-plugin', 'get-count'."
             );
             console.log("Example: 'npm run execute get-address'");
             break;
