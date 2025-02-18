@@ -1,4 +1,6 @@
-import { PLUGIN_ADDRESS } from "./constants";
+import { CHAIN, PLUGIN_ADDRESS } from "./constants";
+import { CounterPluginAbi } from "../abi/CounterPluginAbi";
+import { createPublicClient, http, getContract } from "viem";
 
 async function isCounterPluginInstalled(
     extendedAccount: any
@@ -35,34 +37,28 @@ async function uninstallCounterPlugin(extendedAccount: any) {
 
     console.log("Uninstalling the plugin...");
     const res = await extendedAccount.uninstallPlugin({
-        args: [PLUGIN_ADDRESS],
+        pluginAddress: PLUGIN_ADDRESS,
     });
     console.log("Counter Plugin uninstalled:", res.hash);
     return res;
 }
 
-async function getCount(extendedAccount: any): Promise<number> {
+async function increment(extendedAccount: any) {
     if (!await isCounterPluginInstalled(extendedAccount)) {
         throw new Error("Counter plugin not installed");
     }
 
-    // Call the count mapping getter function with the account's address
-    const count = await extendedAccount.provider.call({
-        to: PLUGIN_ADDRESS,
-        data: `0x${
-            // count function selector
-            "c2ee4188" +
-            // pad the address to 32 bytes
-            extendedAccount.address.slice(2).padStart(64, "0")
-            }`
+    console.log("Incrementing counter...");
+    const res = await extendedAccount.increment({
+        args: [],
     });
-
-    // Convert the hex string result to a number
-    return parseInt(count, 16);
+    console.log("Counter incremented:", res.hash);
+    return res;
 }
+
 
 export {
     installCounterPlugin,
-    getCount,
+    increment,
     uninstallCounterPlugin,
 };

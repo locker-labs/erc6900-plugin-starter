@@ -12,7 +12,7 @@
     "get-address": "pnpm exec-action get-address",
     "install-plugin": "pnpm exec-action install-plugin",
     "uninstall-plugin": "pnpm exec-action uninstall-plugin",
-    "get-count": "pnpm exec-action get-count"
+    "increment": "pnpm exec-action increment"
   },
   "keywords": [],
   "author": "",

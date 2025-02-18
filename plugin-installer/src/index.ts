@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { getAccountAddress, getModularAccountClient } from "./client";
 import { counterPluginActions } from "./plugin-gens/counter/plugin";
-import { getCount, installCounterPlugin, uninstallCounterPlugin } from "./plugin-actions";
+import { increment, installCounterPlugin, uninstallCounterPlugin } from "./plugin-actions";
 dotenv.config();
 
 export async function main() {
@@ -23,10 +23,10 @@ export async function main() {
             await uninstallCounterPlugin(extendedAccount);
             break;
 
-        case "get-count":
-            const count = await getCount(extendedAccount);
-            console.log("Count:", count);
+        case "increment":
+            await increment(extendedAccount);
             break;
+
 
         default:
             console.log(

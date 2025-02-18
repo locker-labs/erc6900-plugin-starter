@@ -1,5 +1,5 @@
-import { baseSepolia } from "@account-kit/infra";
+import { baseSepolia, sepolia } from "@account-kit/infra";
 
-export const CHAIN = baseSepolia
-export const PLUGIN_ADDRESS = "0x917ffCefE6D09644107bB7425946c774221Af2D7"
+export const CHAIN = sepolia
+export const PLUGIN_ADDRESS = "0x8F9a6C54FF92211e584E27DA18D9Cb9488b5030a"
 // export const PLUGIN_ADDRESS = "0x1eBaA4C7808bEeA5d370Db94850f08BD0791dFF0"
