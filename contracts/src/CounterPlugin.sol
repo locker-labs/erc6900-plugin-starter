@@ -53,23 +53,27 @@ contract CounterPlugin is BasePlugin {
         count[msg.sender]++;
     }
 
-    /// @notice This function is modified to always return true for validation
-    /// @dev This is a simplified version that doesn't use MultiOwner plugin
     function userOpValidationFunction(
-        uint8 functionId,
-        UserOperation calldata userOp,
-        bytes32 userOpHash
-    ) external override(BasePlugin) returns (uint256) {
-        // Ignore the input parameters since we're always returning true
-        (functionId, userOp, userOpHash);
-        
-        // Return packed validation data where:
-        // - validAfter = 0 (6 bytes)
-        // - validUntil = type(uint48).max (6 bytes) 
-        // - authorizer = address(1) (20 bytes)
-        // This indicates the operation is always valid
-        return (uint256(type(uint48).max) << 48) | 1;
-    }
+    uint8 functionId,
+    UserOperation calldata userOp,
+    bytes32 userOpHash
+) external override(BasePlugin) returns (uint256) {
+    // Ignore the input parameters since we're always returning true
+    (functionId, userOp, userOpHash);
+
+    // Return packed validation data where:
+    // - validAfter = 0 (6 bytes)
+    // - validUntil = type(uint48).max (6 bytes) 
+    // - authorizer = address(0) (20 bytes)
+    // This indicates the operation is always valid
+    uint48 validAfter = 0;
+    uint48 validUntil = type(uint48).max;
+    uint160 authorizer = 0;
+
+    // Correct the ordering: uint48 validAfter | uint48 validUntil | uint160 authorizer
+    return (uint256(validAfter) << 208) | (uint256(validUntil) << 160) | authorizer;
+}
+
     // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     // ┃    Plugin interface functions    ┃
     // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛

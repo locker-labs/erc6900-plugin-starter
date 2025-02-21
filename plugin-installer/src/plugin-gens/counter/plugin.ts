@@ -104,7 +104,7 @@ export type CounterPluginActions<
   ReadAndEncodeActions;
 
 const addresses = {
-  11155111: "0x8F9a6C54FF92211e584E27DA18D9Cb9488b5030a" as Address,
+  11155111: "0x49fa8A39a71c5CBC698eBA4A972Fbc92FfF30227" as Address,
 } as Record<number, Address>;
 
 export const CounterPlugin: Plugin<typeof CounterPluginAbi> = {
