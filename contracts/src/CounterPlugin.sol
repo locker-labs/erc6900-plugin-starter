@@ -14,7 +14,7 @@ import {
 import {UserOperation} from "@alchemy/modular-account/src/interfaces/erc4337/UserOperation.sol";
 
 /// @title Counter Plugin
-/// @author Alchemy
+/// @author Locker Team
 /// @notice This plugin lets increment a count!
 contract CounterPlugin is BasePlugin {
     // metadata used by the pluginMetadata() method down below
@@ -22,13 +22,6 @@ contract CounterPlugin is BasePlugin {
     string public constant VERSION = "0.0.1";
     string public constant AUTHOR = "Locker Team";
 
-    // this is a constant used in the manifest, to reference our only dependency: the multi owner plugin
-    // since it is the first, and only, plugin the index 0 will reference the multi owner plugin
-    // we can use this to tell the modular account that we should use the multi owner plugin to validate our user op
-    // in other words, we'll say "make sure the person calling increment is an owner of the account using our multiowner plugin"
-    // uint256 internal constant _MANIFEST_DEPENDENCY_INDEX_OWNER_RUNTIME_VALIDATION = 0;
-    // uint256 internal constant _MANIFEST_DEPENDENCY_INDEX_OWNER_USER_OP_VALIDATION = 0;
-    
     /*
     * Note to Developer:
     * If you're using storage during validation, you need to use "associated storage".
@@ -54,25 +47,25 @@ contract CounterPlugin is BasePlugin {
     }
 
     function userOpValidationFunction(
-    uint8 functionId,
-    UserOperation calldata userOp,
-    bytes32 userOpHash
-) external override(BasePlugin) returns (uint256) {
-    // Ignore the input parameters since we're always returning true
-    (functionId, userOp, userOpHash);
+        uint8 functionId,
+        UserOperation calldata userOp,
+        bytes32 userOpHash
+    ) external override(BasePlugin) returns (uint256) {
+        // Ignore the input parameters since we're always returning true
+        (functionId, userOp, userOpHash);
 
-    // Return packed validation data where:
-    // - validAfter = 0 (6 bytes)
-    // - validUntil = type(uint48).max (6 bytes) 
-    // - authorizer = address(0) (20 bytes)
-    // This indicates the operation is always valid
-    uint48 validAfter = 0;
-    uint48 validUntil = type(uint48).max;
-    uint160 authorizer = 0;
+        // Return packed validation data where:
+        // - validAfter = 0 (6 bytes)
+        // - validUntil = type(uint48).max (6 bytes) 
+        // - authorizer = address(0) (20 bytes)
+        // This indicates the operation is always valid
+        uint48 validAfter = 0;
+        uint48 validUntil = type(uint48).max;
+        uint160 authorizer = 0;
 
-    // Correct the ordering: uint48 validAfter | uint48 validUntil | uint160 authorizer
-    return (uint256(validAfter) << 208) | (uint256(validUntil) << 160) | authorizer;
-}
+        // Correct the ordering: uint48 validAfter | uint48 validUntil | uint160 authorizer
+        return (uint256(validAfter) << 208) | (uint256(validUntil) << 160) | authorizer;
+    }
 
     // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     // ┃    Plugin interface functions    ┃

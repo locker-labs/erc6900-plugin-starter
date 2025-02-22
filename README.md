@@ -11,7 +11,7 @@ pnpm install
 
 # Build the contracts
 cd contracts
-pnpm build
+forge build
 # Deploy contract and note the address
 forge script script/CounterPlugin.s.sol:CounterPluginScript --rpc-url RPC_URL --private-key PRIVATE_KEY --broadcast
 
@@ -26,7 +26,7 @@ pnpm build
 # Get the address of the modular account that the plugin will be installed on
 pnpm get-address
 
-# -> DO THIS MANUALLY: end some ETH to the address so it can pay for gas <-
+# -> DO THIS MANUALLY: end some ET\H to the address so it can pay for gas <-
 
 # Install the plugin
 pnpm install-plugin
